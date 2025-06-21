@@ -1,87 +1,101 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOMContentLoaded: HTMLが完全に読み込まれて解析された後に実行されるイベントリスナー
+    // DOMContentLoaded: HTMLドキュメントが完全に読み込まれ、解析された後にこの関数が実行されます。
+    // これにより、JavaScriptがHTML要素にアクセスできるようになります。
 
-    // 主要な要素の取得
+    // --- 1. 主要なDOM要素の取得 ---
     const learnMoreBtn = document.getElementById('learnMoreBtn'); // 「もっと詳しく」ボタン
-    const loadingScreen = document.getElementById('loading-screen'); // ローディング画面要素
-    const animatedElements = document.querySelectorAll('.fade-in-up, .slide-in-left, .slide-in-bottom, .slide-in-right'); // アニメーション対象要素
+    const loadingScreen = document.getElementById('loading-screen'); // ウェブサイトのローディング画面要素
+    // アニメーションの対象となる要素を全て選択します。
+    // .fade-in-up, .slide-in-left, .slide-in-bottom, .slide-in-right などのクラスを持つ要素です。
+    const animatedElements = document.querySelectorAll('.fade-in-up, .slide-in-left, .slide-in-bottom, .slide-in-right');
 
-    // --- 1. ローディング画面の処理 ---
+
+    // --- 2. ローディング画面の制御 ---
+    // ウェブサイトのコンテンツを表示する関数
     const showWebsite = () => {
-        // ローディング画面にフェードアウトクラスを追加
+        // ローディング画面にCSSクラス 'fade-out' を追加し、フェードアウトアニメーションを開始します。
         loadingScreen.classList.add('fade-out');
 
-        // transitionendイベントでアニメーション終了後に要素を完全に非表示にする
-        loadingScreen.addEventListener('transitionend', () => {
-            loadingScreen.style.display = 'none'; // 完全に非表示にする
-            document.body.style.overflowY = 'auto'; // 本体のスクロールを許可する
-        }, { once: true }); // イベントリスナーを一度だけ実行する
+        // ★★★ ここが修正点です ★★★
+        // transitionendイベントではなく、setTimeoutで確実に非表示にします。
+        // '1000'ms (1秒) はCSSで設定されているフェードアウトのアニメーション時間（`transition: opacity 1s ease-out;`）に
+        // 合わせています。これにより、アニメーションが完了するのを待ってから `display: none;` が適用され、
+        // フリーズしたように見える問題を回避できます。
+        setTimeout(() => {
+            loadingScreen.style.display = 'none'; // ローディング画面をDOMから完全に非表示にします
+            document.body.style.overflowY = 'auto'; // body要素の垂直スクロールを許可します
+        }, 1000); // CSSのトランジション時間に合わせて調整してください (例: CSSが0.8秒なら800ms)
 
-        // ページコンテンツの初期アニメーションをトリガー
+        // ページの初期コンテンツアニメーションをトリガーします。
+        // ローディング画面が非表示になるタイミングで実行されるようにします。
         activateAnimationsOnScroll();
     };
 
-    // ページ読み込み時に一時的にスクロールを禁止し、ローディング画面表示後に解除
+    // ページが読み込まれた直後、一時的にbodyのスクロールを禁止します。
+    // これにより、ローディング画面が表示されている間、ユーザーがコンテンツをスクロールするのを防ぎます。
     document.body.style.overflowY = 'hidden';
-    // 3秒後にウェブサイトを表示する (ローディング画面をフェードアウトさせる)
+    // ページロード後3秒（3000ms）後に showWebsite 関数を実行し、ローディング画面を非表示にし始めます。
     setTimeout(showWebsite, 3000);
 
 
-    // --- 2. 「もっと詳しく」ボタンの処理 ---
-    // もしlearnMoreBtnが存在すれば（ホームページの場合のみ）
+    // --- 3. 「もっと詳しく」ボタンの機能 ---
+    // learnMoreBtn が存在する場合のみ（主にindex.htmlにこのボタンがあるため）処理を実行します。
     if (learnMoreBtn) {
         learnMoreBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // デフォルトの動作（ページ内スクロール）をキャンセル
-            window.location.href = 'about.html'; // about.htmlに遷移
+            e.preventDefault(); // クリックイベントのデフォルト動作（この場合はページ内ジャンプ）をキャンセルします。
+            window.location.href = 'about.html'; // 'about.html' ページへリダイレクトします。
         });
     }
 
 
-    // --- 3. ナビゲーションリンクのスムーズスクロール処理 ---
-    // 全てのナビゲーションリンクに対してイベントリスナーを設定
+    // --- 4. ナビゲーションリンクのスムーズスクロールとページ遷移 ---
+    // ヘッダー内の全てのナビゲーションリンク（`nav ul li a`）にイベントリスナーを設定します。
     document.querySelectorAll('nav ul li a').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href'); // リンクのhref属性を取得
+            const targetId = this.getAttribute('href'); // クリックされたリンクの `href` 属性を取得します。
 
-            // もしリンクが '#' で始まる場合（ページ内リンク）
+            // `href` が '#' で始まる場合（例: #about, #content）、それはページ内リンクと判断します。
             if (targetId.startsWith('#')) {
-                e.preventDefault(); // デフォルトの動作（ページジャンプ）をキャンセル
-                // 指定されたIDの要素までスムーズにスクロール
+                e.preventDefault(); // デフォルトの動作（瞬間的なページジャンプ）をキャンセルします。
+                // リンク先のIDを持つ要素までスムーズにスクロールします。
                 document.querySelector(targetId).scrollIntoView({
-                    behavior: 'smooth'
+                    behavior: 'smooth' // スムーズなスクロールアニメーションを有効にします。
                 });
             }
-            // それ以外（別ページへのリンク例: index.html, about.htmlなど）は
-            // ブラウザのデフォルト動作（ページ遷移）に任せる
+            // `href` が '#' で始まらない場合（例: index.html, about.html）、
+            // それは別ページへのリンクと判断し、ブラウザのデフォルトのページ遷移動作に任せます。
         });
     });
 
 
-    // --- 4. スクロールアニメーションの処理 ---
-    // 要素が画面内に表示されたときにactiveクラスを追加/削除する関数
+    // --- 5. スクロール時の要素アニメーション (フェードイン・スライドイン) ---
+    // 画面内の要素の表示状態をチェックし、アニメーションをトリガーする関数です。
     const checkVisibility = () => {
         animatedElements.forEach(element => {
-            const rect = element.getBoundingClientRect(); // 要素の表示領域情報を取得
-            // 要素がビューポートの80%以上表示されているか、かつビューポート内に収まっているかを確認
+            // 各要素のビューポート内での位置とサイズ情報を取得します。
+            const rect = element.getBoundingClientRect();
+            // 要素がビューポートの約80%以上表示されているか、かつビューポート内に収まっているかを判断します。
             const isVisible = (
                 rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
                 rect.bottom >= 0
             );
 
             if (isVisible) {
-                element.classList.add('active'); // activeクラスを追加してアニメーションをトリガー
-            } else {
-                // 画面外に出たらactiveクラスを削除する（要素が再表示されたときにアニメーションを繰り返したい場合）
-                // 現在のプロジェクトでは、一度アニメーションしたらそのままなので、この行はコメントアウトしています。
-                // element.classList.remove('active');
+                // 要素が可視であれば 'active' クラスを追加し、CSSアニメーションを適用します。
+                element.classList.add('active');
             }
+            // else {
+            //     // 要素が画面外に出たときに 'active' クラスを削除したい場合（アニメーションを繰り返す場合）は、
+            //     // 上のコメントアウトを外してください。現在の設定では一度アニメーションしたらそのままです。
+            //     // element.classList.remove('active');
+            // }
         });
     };
 
-    // スクロールとリサイズイベントにアニメーションチェック関数を紐づける
+    // スクロールアニメーションを有効にする関数です。
     const activateAnimationsOnScroll = () => {
-        checkVisibility(); // 初回ロード時にもチェック
-        window.addEventListener('scroll', checkVisibility); // スクロール時にチェック
-        window.addEventListener('resize', checkVisibility); // ウィンドウサイズ変更時にチェック
+        checkVisibility(); // ページがロードされた時点で一度、要素の可視性をチェックします。
+        window.addEventListener('scroll', checkVisibility); // ユーザーがスクロールするたびに可視性をチェックします。
+        window.addEventListener('resize', checkVisibility); // ウィンドウのサイズが変更されるたびに可視性をチェックします。
     };
 });
