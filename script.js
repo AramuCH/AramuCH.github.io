@@ -16,11 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // ローディング画面にCSSクラス 'fade-out' を追加し、フェードアウトアニメーションを開始します。
         loadingScreen.classList.add('fade-out');
 
-        // ★★★ ここが修正点です ★★★
-        // transitionendイベントではなく、setTimeoutで確実に非表示にします。
-        // '1000'ms (1秒) はCSSで設定されているフェードアウトのアニメーション時間（`transition: opacity 1s ease-out;`）に
-        // 合わせています。これにより、アニメーションが完了するのを待ってから `display: none;` が適用され、
-        // フリーズしたように見える問題を回避できます。
+        // setTimeout を使用して、ローディングアニメーションが完了するのを待ってから
+        // ローディング画面を完全に非表示にし、ページのスクロールを許可します。
+        // ここでの '1000'ms (1秒) は、CSSで設定された 'fade-out' トランジションの時間と合わせるか、
+        // それより少し長めに設定することで、アニメーションが途中で切れるのを防ぎます。
         setTimeout(() => {
             loadingScreen.style.display = 'none'; // ローディング画面をDOMから完全に非表示にします
             document.body.style.overflowY = 'auto'; // body要素の垂直スクロールを許可します
@@ -34,8 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ページが読み込まれた直後、一時的にbodyのスクロールを禁止します。
     // これにより、ローディング画面が表示されている間、ユーザーがコンテンツをスクロールするのを防ぎます。
     document.body.style.overflowY = 'hidden';
-    // ページロード後3秒（3000ms）後に showWebsite 関数を実行し、ローディング画面を非表示にし始めます。
-    setTimeout(showWebsite, 3000);
+    // ★★★ ここを修正します ★★★
+    // 5秒（5000ミリ秒）後にウェブサイトを表示する (ローディング画面をフェードアウトさせる)
+    setTimeout(showWebsite, 5000);
 
 
     // --- 3. 「もっと詳しく」ボタンの機能 ---
