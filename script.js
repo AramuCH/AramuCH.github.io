@@ -1,72 +1,87 @@
-// script.js
+document.addEventListener('DOMContentLoaded', () => {
+    // DOMContentLoaded: HTMLが完全に読み込まれて解析された後に実行されるイベントリスナー
 
-// スムーズスクロール
-document.querySelectorAll('nav ul li a, .button').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
+    // 主要な要素の取得
+    const learnMoreBtn = document.getElementById('learnMoreBtn'); // 「もっと詳しく」ボタン
+    const loadingScreen = document.getElementById('loading-screen'); // ローディング画面要素
+    const animatedElements = document.querySelectorAll('.fade-in-up, .slide-in-left, .slide-in-bottom, .slide-in-right'); // アニメーション対象要素
 
-        const targetId = this.getAttribute('href').substring(1);
-        const targetElement = document.getElementById(targetId);
+    // --- 1. ローディング画面の処理 ---
+    const showWebsite = () => {
+        // ローディング画面にフェードアウトクラスを追加
+        loadingScreen.classList.add('fade-out');
 
-        if (targetElement) {
-            window.scrollTo({
-                top: targetElement.offsetTop - (document.querySelector('header').offsetHeight), // ヘッダーの高さ分調整
-                behavior: 'smooth'
-            });
-            // モバイルメニューが開いている場合は閉じる
-            if (navUl.classList.contains('active')) {
-                navUl.classList.remove('active');
-                menuToggle.classList.remove('open');
-            }
-        }
-    });
-});
-
-// ハンバーガーメニュー
-const menuToggle = document.querySelector('.menu-toggle');
-const navUl = document.querySelector('nav ul');
-
-if (menuToggle && navUl) {
-    menuToggle.addEventListener('click', () => {
-        navUl.classList.toggle('active');
-        menuToggle.classList.toggle('open');
-    });
-}
-
-// スクロール時の要素アニメーション (Intersection Observer APIを使用)
-const animateOnScrollElements = document.querySelectorAll('.animate-on-scroll');
-
-const observerOptions = {
-    root: null, // ビューポートをルートとする
-    rootMargin: '0px',
-    threshold: 0.1 // 要素が10%見えたら発火
-};
-
-const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target); // 一度アニメーションしたら監視を停止
-        }
-    });
-}, observerOptions);
-
-animateOnScrollElements.forEach(element => {
-    observer.observe(element);
-});
-
-
-// ローディング画面の非表示処理
-window.addEventListener('load', () => {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-        loadingScreen.classList.add('hidden');
-        // ローディング画面が完全に消えてからヒーローセクションのアニメーションを開始
+        // transitionendイベントでアニメーション終了後に要素を完全に非表示にする
         loadingScreen.addEventListener('transitionend', () => {
-            const heroSection = document.querySelector('.hero-section');
-            if (heroSection) {
-                heroSection.style.opacity = 1; // ここでアニメーションのトリガー
-            }
-        }, { once: true }); // 一度だけ実行
+            loadingScreen.style.display = 'none'; // 完全に非表示にする
+            document.body.style.overflowY = 'auto'; // 本体のスクロールを許可する
+        }, { once: true }); // イベントリスナーを一度だけ実行する
+
+        // ページコンテンツの初期アニメーションをトリガー
+        activateAnimationsOnScroll();
+    };
+
+    // ページ読み込み時に一時的にスクロールを禁止し、ローディング画面表示後に解除
+    document.body.style.overflowY = 'hidden';
+    // 3秒後にウェブサイトを表示する (ローディング画面をフェードアウトさせる)
+    setTimeout(showWebsite, 3000);
+
+
+    // --- 2. 「もっと詳しく」ボタンの処理 ---
+    // もしlearnMoreBtnが存在すれば（ホームページの場合のみ）
+    if (learnMoreBtn) {
+        learnMoreBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // デフォルトの動作（ページ内スクロール）をキャンセル
+            window.location.href = 'about.html'; // about.htmlに遷移
+        });
     }
+
+
+    // --- 3. ナビゲーションリンクのスムーズスクロール処理 ---
+    // 全てのナビゲーションリンクに対してイベントリスナーを設定
+    document.querySelectorAll('nav ul li a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href'); // リンクのhref属性を取得
+
+            // もしリンクが '#' で始まる場合（ページ内リンク）
+            if (targetId.startsWith('#')) {
+                e.preventDefault(); // デフォルトの動作（ページジャンプ）をキャンセル
+                // 指定されたIDの要素までスムーズにスクロール
+                document.querySelector(targetId).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+            // それ以外（別ページへのリンク例: index.html, about.htmlなど）は
+            // ブラウザのデフォルト動作（ページ遷移）に任せる
+        });
+    });
+
+
+    // --- 4. スクロールアニメーションの処理 ---
+    // 要素が画面内に表示されたときにactiveクラスを追加/削除する関数
+    const checkVisibility = () => {
+        animatedElements.forEach(element => {
+            const rect = element.getBoundingClientRect(); // 要素の表示領域情報を取得
+            // 要素がビューポートの80%以上表示されているか、かつビューポート内に収まっているかを確認
+            const isVisible = (
+                rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8 &&
+                rect.bottom >= 0
+            );
+
+            if (isVisible) {
+                element.classList.add('active'); // activeクラスを追加してアニメーションをトリガー
+            } else {
+                // 画面外に出たらactiveクラスを削除する（要素が再表示されたときにアニメーションを繰り返したい場合）
+                // 現在のプロジェクトでは、一度アニメーションしたらそのままなので、この行はコメントアウトしています。
+                // element.classList.remove('active');
+            }
+        });
+    };
+
+    // スクロールとリサイズイベントにアニメーションチェック関数を紐づける
+    const activateAnimationsOnScroll = () => {
+        checkVisibility(); // 初回ロード時にもチェック
+        window.addEventListener('scroll', checkVisibility); // スクロール時にチェック
+        window.addEventListener('resize', checkVisibility); // ウィンドウサイズ変更時にチェック
+    };
 });
