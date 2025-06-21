@@ -1,0 +1,233 @@
+/* 全体の基本設定 */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #FFFAF0; /* フローラルホワイト - 背景色 */
+    color: #333;
+    line-height: 1.6;
+    box-sizing: border-box; /* パディングとボーダーを幅に含める */
+    overflow-x: hidden; /* 横スクロールバーが出ないように */
+}
+
+/* ヘッダー */
+header {
+    background-color: #FFDAB9; /* ピーチパフ - メインのパステルオレンジ */
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem; /* モバイル向けに調整 */
+    color: #8B4513; /* サドルブラウン - 文字色 */
+}
+
+/* ナビゲーション */
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex; /* フレックスボックスを使用 */
+    flex-direction: column; /* 縦並びにする */
+    align-items: center; /* 中央寄せ */
+    margin-top: 10px;
+}
+
+nav ul li {
+    margin: 5px 0; /* 縦方向のマージンを調整 */
+}
+
+nav ul li a {
+    color: #8B4513; /* サドルブラウン */
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px; /* タップしやすくする */
+    display: block; /* リンク全体をタップ可能にする */
+    transition: color 0.3s ease, transform 0.3s ease; /* ホバー時のアニメーションを追加 */
+}
+
+nav ul li a:hover {
+    color: #CD853F; /* ペルー */
+    transform: scale(1.05); /* ホバー時に少し拡大 */
+}
+
+/* メインコンテンツ */
+main {
+    padding: 15px; /* モバイル向けにパディングを調整 */
+    max-width: 960px;
+    margin: 15px auto; /* マージンを調整 */
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    border-radius: 8px;
+}
+
+/* ヒーローセクションの背景とアニメーション */
+.hero {
+    text-align: center;
+    padding: 30px 15px;
+    background-color: #FFFAF0; /* ベースの色（背景色） */
+    background-image:
+        linear-gradient(45deg, #FFDAB9 25%, transparent 25%), /* ピーチパフの斜線1 */
+        linear-gradient(-45deg, #FFDAB9 25%, transparent 25%), /* ピーチパフの斜線2 */
+        linear-gradient(45deg, transparent 75%, #FFE4B5 75%), /* ミカドイエローの斜線1 */
+        linear-gradient(-45deg, transparent 75%, #FFE4B5 75%); /* ミカドイエローの斜線2 */
+    background-size: 30px 30px; /* パターンの繰り返しサイズ */
+    background-position: 0 0, 0 15px, 15px -15px, 15px 0px; /* 各グラデーションの配置 */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    opacity: 0; /* 初期状態では非表示 */
+    transform: translateY(20px); /* 初期状態では少し下に配置 */
+    animation: fadeInSlideUp 1s ease-out forwards; /* アニメーション適用 */
+    animation-delay: 0.5s; /* 0.5秒遅れて開始 */
+}
+
+/* ヒーローセクションのフェードインアニメーションキーフレーム */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero h2 {
+    font-size: 2rem; /* モバイル向けに調整 */
+    color: #A0522D; /* シエナ - 少し濃いオレンジ */
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1rem; /* モバイル向けに調整 */
+    color: #696969; /* ダークグレイ */
+    margin-bottom: 20px;
+}
+
+.hero button {
+    background-color: #FF7F50; /* コーラル - アクセントカラー */
+    color: #fff;
+    border: none;
+    padding: 10px 20px; /* モバイル向けに調整 */
+    font-size: 1rem; /* モバイル向けに調整 */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease; /* クリック時のアニメーションを追加 */
+}
+
+.hero button:hover {
+    background-color: #F08080; /* ライトコーラル */
+}
+
+.hero button:active { /* ボタンがクリックされた時のスタイル */
+    transform: scale(0.95); /* 少し縮む */
+}
+
+.content h3 {
+    font-size: 1.8rem; /* モバイル向けに調整 */
+    color: #A0522D; /* シエナ */
+    border-bottom: 2px solid #FFDAB9;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+.content ul {
+    list-style: disc;
+    margin-left: 15px; /* モバイル向けに調整 */
+}
+
+.content ul li {
+    margin-bottom: 8px;
+    color: #555;
+}
+
+/* フッター */
+footer {
+    background-color: #FFDAB9; /* ピーチパフ */
+    color: #8B4513; /* サドルブラウン */
+    text-align: center;
+    padding: 0.8rem 0; /* パディングを調整 */
+    margin-top: 20px;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+    font-size: 0.9rem; /* フォントサイズを調整 */
+}
+
+/* --- レスポンシブ対応のためのメディアクエリ --- */
+
+/* タブレット (幅が768px以上) */
+@media (min-width: 768px) {
+    header h1 {
+        font-size: 2.2rem;
+    }
+
+    nav ul {
+        flex-direction: row; /* 横並びに戻す */
+        margin-top: 0; /* マージンをリセット */
+    }
+
+    nav ul li {
+        margin: 0 15px; /* 左右のマージンを調整 */
+    }
+
+    .hero {
+        padding: 30px 20px;
+    }
+
+    .hero h2 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .hero button {
+        padding: 12px 25px;
+        font-size: 1.05rem;
+    }
+
+    .content h3 {
+        font-size: 1.9rem;
+    }
+
+    main {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    footer {
+        padding: 1rem 0;
+        font-size: 1rem;
+    }
+}
+
+/* デスクトップ (幅が1024px以上) */
+@media (min-width: 1024px) {
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero {
+        padding: 40px 20px;
+    }
+
+    .hero h2 {
+        font-size: 2.8rem;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+    }
+
+    .hero button {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+
+    .content h3 {
+        font-size: 2rem;
+    }
+}
